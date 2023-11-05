@@ -110,7 +110,14 @@ class MainActivity : AppCompatActivity() {
                             if (parts.size > 1) {
                                 val parsedString = parts[1]
                                 Log.d(TAG, "kode: ${parsedString}")
-                                viewModel.getKode(parsedString)
+                                val json = """
+                                        {
+                                            "kode_unik": "${parsedString}"
+                                        }
+                                        """.trimIndent()
+                                val mediaType = "application/json; charset=utf-8".toMediaType()
+                                val requestBody = json.toRequestBody(mediaType)
+                                viewModel.getKode(requestBody)
                                     .observe(this@MainActivity) { result ->
 //                                    if (result != null){
 //                                        when (result) {
@@ -133,14 +140,7 @@ class MainActivity : AppCompatActivity() {
 //                                            else -> {}
 //                                        }
 //                                    }
-                                        val json = """
-                                        {
-                                            "kode_unik": "${parsedString}"
-                                        }
-                                        """.trimIndent()
-//                                        val mediaType = "application/json; charset=utf-8".toMediaType()
-//                                        val requestBody = json.toRequestBody(mediaType)
-                                        val call = ApiConfig.getApiConfig().validasi(json)
+                                        val call = ApiConfig.getApiConfig().validasi(requestBody)
                                         call.enqueue(object : Callback<BarcodeResponse> {
                                             override fun onResponse(
                                                 call: Call<BarcodeResponse>,
@@ -187,7 +187,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
-
+    
     override fun onPause() {
         super.onPause()
         supportActionBar!!.hide()

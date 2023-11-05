@@ -4,9 +4,10 @@ import com.google.gson.Gson
 import retrofit2.HttpException
 import androidx.lifecycle.liveData
 import com.extrainch.qrbarcodescanner.retrofit.ApiConfig
+import okhttp3.RequestBody
 
 class Repository {
-    fun uploadKode(request: String) = liveData {
+    fun uploadKode(request: RequestBody) = liveData {
 //        emit(ResultState.Loading)
         try {
             val successResponse = ApiConfig.getApiConfig().validasi(request)
