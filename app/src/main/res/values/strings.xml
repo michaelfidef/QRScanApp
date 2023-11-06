@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">QRScan</string>
+    <string name="app_name">Festival Band</string>
     <string name="barcode_text">Barcode Text</string>
+    <string name="title_activity_splash">SplashActivity</string>
 </resources>

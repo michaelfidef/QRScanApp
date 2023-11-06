@@ -1,4 +1,4 @@
-package com.extrainch.qrbarcodescanner
+package com.extrainch.qrbarcodescanner.mainView
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -12,8 +12,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.extrainch.qrbarcodescanner.Repository
+import com.extrainch.qrbarcodescanner.ResultState
 import com.extrainch.qrbarcodescanner.databinding.ActivityMainBinding
-import com.extrainch.qrbarcodescanner.retrofit.ApiConfig
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.Detector.Detections
@@ -21,9 +22,6 @@ import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.IOException
 
 
@@ -90,7 +88,7 @@ class MainActivity : AppCompatActivity() {
 
         barcodeDetector?.setProcessor(object : Detector.Processor<Barcode> {
             override fun release() {
-                // Toast.makeText(getApplicationContext(), "To prevent memory leaks barcode scanner has been stopped", Toast.LENGTH_SHORT).show();
+
             }
 
             override fun receiveDetections(detections: Detections<Barcode>) {
@@ -119,34 +117,12 @@ class MainActivity : AppCompatActivity() {
                                 val requestBody = json.toRequestBody(mediaType)
                                 viewModel.getKode(requestBody)
                                     .observe(this@MainActivity) { result ->
-//                                    if (result != null){
-//                                        when (result) {
-//
-//                                            is ResultState.Success -> {
-//                                                val response = result.data
-//                                                AlertDialog.Builder(this@MainActivity).apply {
-//                                                    setTitle("BERHASIL!")
-//                                                    setMessage("kode barcode anda benar")
-//                                                    setPositiveButton("Ok") { _, _ ->
-//                                                    }
-//                                                    show()
-//                                                }
-//                                            }
-//
-//                                            is ResultState.Error -> {
-//                                                showToast(result.error)
-//                                            }
-//
-//                                            else -> {}
-//                                        }
-//                                    }
-                                        val call = ApiConfig.getApiConfig().validasi(requestBody)
-                                        call.enqueue(object : Callback<BarcodeResponse> {
-                                            override fun onResponse(
-                                                call: Call<BarcodeResponse>,
-                                                response: Response<BarcodeResponse>
-                                            ) {
-                                                if (response.isSuccessful) {
+                                        if (result != null) {
+                                            when (result) {
+
+                                                is ResultState.Success -> {
+                                                    val response = result.data
+                                                    Log.d(TAG, "receiveDetections: $response")
                                                     AlertDialog.Builder(this@MainActivity).apply {
                                                         setTitle("BERHASIL!")
                                                         setMessage("kode barcode anda benar")
@@ -154,19 +130,27 @@ class MainActivity : AppCompatActivity() {
                                                         }
                                                         show()
                                                     }
-                                                } else {
-                                                    val errorBody = response.message()
-                                                    Log.e(TAG, "onFailure: ${errorBody}")
+                                                }
+
+                                                is ResultState.Error -> {
+                                                    showToast(result.error)
+                                                    Log.e(
+                                                        TAG,
+                                                        "receiveDetections: ${result.error}",
+                                                    )
+                                                }
+
+                                                else -> {
+                                                    AlertDialog.Builder(this@MainActivity).apply {
+                                                        setTitle("KODE SUDAH TERPAKAI!")
+                                                        setMessage("maaf kode tidak valid!")
+                                                        setPositiveButton("Ok") { _, _ ->
+                                                        }
+                                                        show()
+                                                    }
                                                 }
                                             }
-
-                                            override fun onFailure(
-                                                call: Call<BarcodeResponse>,
-                                                t: Throwable
-                                            ) {
-                                                Log.e("TAG", "onFailure: ${t.message}")
-                                            }
-                                        })
+                                        }
                                     }
                             } else {
                                 AlertDialog.Builder(this@MainActivity).apply {
@@ -175,7 +159,6 @@ class MainActivity : AppCompatActivity() {
                                     setPositiveButton("Ok") { _, _ ->
                                     }
                                     show()
-                                    println("String tidak sesuai format")
                                 }
                             }
                             barcodeData = barcodes.valueAt(0).displayValue
@@ -187,7 +170,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
-    
+
     override fun onPause() {
         super.onPause()
         supportActionBar!!.hide()
@@ -209,3 +192,4 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 }
+

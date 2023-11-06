@@ -17,7 +17,7 @@ object ApiConfig {
             .addInterceptor(authInterceptor)
             .build()
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://female-widespread-pages-sunglasses.trycloudflare.com")
+            .baseUrl("http://170.64.133.47/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
