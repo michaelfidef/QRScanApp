@@ -121,8 +121,6 @@ class MainActivity : AppCompatActivity() {
                                             when (result) {
 
                                                 is ResultState.Success -> {
-                                                    val response = result.data
-                                                    Log.d(TAG, "receiveDetections: $response")
                                                     AlertDialog.Builder(this@MainActivity).apply {
                                                         setTitle("BERHASIL!")
                                                         setMessage("kode barcode anda benar")
@@ -133,33 +131,17 @@ class MainActivity : AppCompatActivity() {
                                                 }
 
                                                 is ResultState.Error -> {
-                                                    showToast(result.error)
-                                                    Log.e(
-                                                        TAG,
-                                                        "receiveDetections: ${result.error}",
-                                                    )
+                                                    showToast("Kode Sudah Terpakai (${result.error})")
                                                 }
 
                                                 else -> {
-                                                    AlertDialog.Builder(this@MainActivity).apply {
-                                                        setTitle("KODE SUDAH TERPAKAI!")
-                                                        setMessage("maaf kode tidak valid!")
-                                                        setPositiveButton("Ok") { _, _ ->
-                                                        }
-                                                        show()
-                                                    }
+
                                                 }
                                             }
                                         }
                                     }
                             } else {
-                                AlertDialog.Builder(this@MainActivity).apply {
-                                    setTitle("SALAH!")
-                                    setMessage("kode barcode anda salah")
-                                    setPositiveButton("Ok") { _, _ ->
-                                    }
-                                    show()
-                                }
+                                showToast("Kode Anda Salah!")
                             }
                             barcodeData = barcodes.valueAt(0).displayValue
                             binding!!.barcodeText.text = barcodeData
